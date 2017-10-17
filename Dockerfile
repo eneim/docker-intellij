@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM picoded/ubuntu-openjdk-8-jdk:16.04 
 
 MAINTAINER Florin Patan "florinpatan@gmail.com"
 
@@ -10,9 +10,19 @@ ENV INTELLIJ_VERSION .IntelliJIdea2017.2
 RUN sed 's/main$/main universe/' -i /etc/apt/sources.list && \
     apt-get update -qq && \
     echo 'Installing OS dependencies' && \
-    apt-get install -qq -y --fix-missing sudo software-properties-common git libxext-dev libxrender-dev libxslt1.1 \
-        libxtst-dev libgtk2.0-0 libcanberra-gtk-module unzip wget && \
-    apt-get -o Dpkg::Options::="--force-overwrite" install -y openjdk-9-jdk && \
+    apt-get install -qq -y --fix-missing \
+        sudo \
+        software-properties-common \
+        git \
+        libxext-dev \
+        libxrender-dev \
+        libxslt1.1 \
+        libxtst-dev \
+        libgtk2.0-0 \
+        libcanberra-gtk-module \
+        unzip \
+        wget \
+        && \
     echo 'Cleaning up' && \
     apt-get clean -qq -y && \
     apt-get autoclean -qq -y && \
