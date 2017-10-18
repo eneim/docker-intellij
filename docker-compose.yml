@@ -1,15 +1,15 @@
 version : '2'
 services:
     intellij:
-        build: .
+        image: gaelrottier/docker-intellij 
         environment:
-            - DISPLAY=:0
+            - DISPLAY=${DISPLAY}
+            - UID=${UID}
+            - GID=${GID}
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - ~/Documents/Programmation:/home/developer/prog
+            - ${PROJECTS_ROOT}:/home/developer/projects-root
             - ~/.m2:/home/developer/.m2
             - ~/.IntelliJIdea2017.2:/home/developer/.IntelliJIdea2017.2
     licence-server:
         image: gaelrottier/idea-licence-server
-        ports:
-            - 1017:1017

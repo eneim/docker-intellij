@@ -6,6 +6,8 @@ ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 ENV INTELLIJ_VERSION .IntelliJIdea2017.2
+ARG UID
+ARG GID
 
 RUN sed 's/main$/main universe/' -i /etc/apt/sources.list && \
     apt-get update -qq && \
@@ -30,18 +32,15 @@ RUN sed 's/main$/main universe/' -i /etc/apt/sources.list && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/*
 
-RUN echo 'Creating user: developer' && \
+
+RUN echo "Creating user: developer" && \
     mkdir -p /home/developer && \
-    echo "developer:x:1000:1000:Developer,,,:/home/developer:/bin/bash" >> /etc/passwd && \
-    echo "developer:x:1000:" >> /etc/group && \
-    sudo echo "developer ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/developer && \
-    sudo chmod 0440 /etc/sudoers.d/developer && \
-    sudo chown developer:developer -R /home/developer && \
-    sudo chown root:root /usr/bin/sudo && \
-    chmod 4755 /usr/bin/sudo
+    echo "developer:x:${UID}:${GID}:Developer,,,:/home/developer:/bin/bash" >> /etc/passwd && \
+    echo "developer:x:${GID}:" >> /etc/group 
 
 RUN mkdir -p /home/developer/${INTELLIJ_VERSION}/config/options && \
-    mkdir -p /home/developer/${INTELLIJ_VERSION}/config/plugins
+    mkdir -p /home/developer/${INTELLIJ_VERSION}/config/plugins && \
+    mkdir -p /opt/intellij
 
 ADD ./jdk.table.xml /home/developer/${INTELLIJ_VERSION}/config/options/jdk.table.xml
 ADD ./jdk.table.xml /home/developer/.jdk.table.xml
@@ -49,18 +48,17 @@ ADD ./jdk.table.xml /home/developer/.jdk.table.xml
 ADD ./run /usr/local/bin/intellij
 
 RUN chmod +x /usr/local/bin/intellij && \
-    chown developer:developer -R /home/developer/${INTELLIJ_VERSION}
+    chown developer:developer -R /home/developer && \
+    chown developer:developer -R /opt/intellij
 
-RUN echo 'Downloading IntelliJ IDEA' && \
-    wget https://download-cf.jetbrains.com/idea/ideaIU-2017.2.5.tar.gz -O /tmp/intellij.tar.gz -q && \
+USER developer
+
+RUN echo "Downloading IntelliJ IDEA" && \
+    curl https://download-cf.jetbrains.com/idea/ideaIU-2017.2.5.tar.gz -o /tmp/intellij.tar.gz && \
     echo 'Installing IntelliJ IDEA' && \
-    mkdir -p /opt/intellij && \
     tar -xf /tmp/intellij.tar.gz --strip-components=1 -C /opt/intellij && \
     rm /tmp/intellij.tar.gz
 
-RUN sudo chown developer:developer -R /home/developer
-
-USER developer
 ENV HOME /home/developer
-WORKDIR /home/developer/prog
+WORKDIR /home/developer/projects-root
 CMD /usr/local/bin/intellij

@@ -1,24 +1,8 @@
 #!/usr/bin/env bash
 
-function delayedPluginInstall {
-    sudo mkdir -p /home/developer/${INTELLIJ_VERSION}/config/plugins
-    sudo mkdir -p /home/developer/${INTELLIJ_VERSION}/config/options
-    sudo chown developer:developer -R /home/developer/${INTELLIJ_VERSION}
+cd /home/developer/${INTELLIJ_VERSION}/config/plugins/
 
-    cd /home/developer/${INTELLIJ_VERSION}/config/plugins/
-
-    # Adding the predefined preferences to IDEA
-    cp /home/developer/.jdk.table.xml /home/developer/${INTELLIJ_VERSION}/config/options/jdk.table.xml
-}
-
-if [ ! -d /home/developer/${INTELLIJ_VERSION}/config/plugins/Go ]; then
-    # We are running with a non-Docker contained volume for IntelliJ prefs so we need to setup the plugin again
-    delayedPluginInstall
-fi
-
-if [ -d /home/developer/${INTELLIJ_VERSION} ]; then
-    # Ensure proper permissions
-    sudo chown developer:developer -R /home/developer/${INTELLIJ_VERSION}
-fi
+# Adding the predefined preferences to IDEA
+#cp /home/developer/.jdk.table.xml /home/developer/${INTELLIJ_VERSION}/config/options/jdk.table.xml
 
 exec /opt/intellij/bin/idea.sh
